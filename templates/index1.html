@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 90%;
+            /* max-width: 800px; */
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        .chat-header {
+            background: #007bff;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            padding-left: 40%;
+        }
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+        .input-box {
+            display: flex;
+            padding: 10px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+        }
+        .input-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        .input-box button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .input-box button:hover {
+            background: #0056b3;
+        }
+        .user-message-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        .user-message {
+            background: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .user-icon {
+            margin-left: 8px;
+            font-size: 20px;
+            color: #007bff;
+        }
+        .bot-response-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+        .bot-icon {
+            margin-right: 8px;
+            font-size: 20px;
+            color: #007bff;
+        }
+        .bot-response {
+            background: #e9ecef;
+            color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .bot-response h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .bot-response ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .bot-response strong {
+            color: #007bff;
+        }
+        .typing-indicator {
+            display: inline-block;
+            background: #e9ecef;
+            color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            max-width: 70%;
+            align-self: flex-start;
+            font-style: italic;
+            opacity: 0.7;
+        }
+        /* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div>AI Chatbot</div>
+            <!-- Rounded switch -->
+<div style="margin-left: 60%;"><label class="switch">
+    <input type="checkbox">
+    <span class="slider round"></span>
+  </label></div>
+        </div>
+
+        <!-- Chat Box -->
+        <div class="chat-box" id="chat-box">
+            <!-- User messages and bot responses will be appended here dynamically -->
+        </div>
+
+        <!-- Input Box -->
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Type your message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("user-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevents new lines
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+    let userInput = document.getElementById("user-input").value.trim();
+    if (!userInput) return; // Don't send empty messages
+
+    let chatBox = document.getElementById("chat-box");
+    let userMessage = `
+        <div class='user-message-container'>
+            <div class='user-message'><strong></strong> ${userInput}</div>
+            <i class="fa-solid fa-circle-user user-icon"></i>
+        </div>`;
+    chatBox.innerHTML += userMessage;
+    document.getElementById("user-input").value = ""; // Clear input field
+
+    // Add typing indicator
+    let typingIndicator = `<div class='typing-indicator'>AI is typing...</div>`;
+    chatBox.innerHTML += typingIndicator;
+    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
+
+    try {
+        let response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: userInput })
+        });
+
+        let data = await response.json();
+        console.log("Response from backend:", data); // Debugging
+
+        // Remove typing indicator
+        chatBox.removeChild(chatBox.lastChild);
+
+        let botResponse = data.answer || "Error: No response from chatbot.";
+        console.log("Raw Response from Backend:", data.answer);
+
+         // **Ensure "Response:" is removed no matter how it appears**
+         // Remove any markdown-based "**Response:**" (bold format)
+        //  botResponse = botResponse.replace(/^\s*\*\*.*?\*\*\s*/i, "");
+        
+        // Check if response needs formatting
+        let isFormatted = botResponse.includes("\n") || botResponse.includes("- ");
+        
+        let formattedResponse = botResponse;
+        if (isFormatted) {
+            formattedResponse = botResponse
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold text
+                .replace(/\n/g, "<br>") // Line breaks
+                .replace(/- (.*?)(<br>|$)/g, "<li>$1</li>"); // Bullet points
+
+            // Wrap bullet points in <ul>
+            if (formattedResponse.includes("<li>")) {
+                formattedResponse = formattedResponse.replace(/<li>(.*?)<\/li>/g, "<ul><li>$1</li></ul>");
+            }
+        }
+
+        let botMessage = `
+            <div class='bot-response-container'>
+                <i class="fa-solid fa-robot fa-lg bot-icon"></i>
+                <div class='bot-response'>${formattedResponse}</div>
+            </div>`;
+        chatBox.innerHTML += botMessage;
+    } catch (error) {
+        console.error("Error:", error);
+        chatBox.innerHTML += `
+            <div class='bot-response-container'>
+                <i class="fa-solid fa-robot fa-lg bot-icon"></i>
+                <div class='bot-response'><strong>AI:</strong> Error fetching response.</div>
+            </div>`;
+    }
+
+    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
+}
+
+    </script>
+</body>
+</html>

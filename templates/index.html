@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .chat-container { width: 50%; margin: auto; }
+        .chat-box { 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+            height: 300px; 
+            overflow-y: auto; 
+            background: #f9f9f9; 
+            margin-bottom: 10px;
+        }
+        .input-box { margin-top: 10px; display: flex; }
+        .input-box input { flex: 1; padding: 10px; }
+        .input-box button { padding: 10px; cursor: pointer; }
+        .user-message { 
+            background: #d1e7dd; 
+            padding: 8px; 
+            margin: 5px; 
+            border-radius: 5px; 
+            text-align: left; 
+        }
+        .bot-response { 
+            background: #f8d7da; 
+            padding: 8px; 
+            margin: 5px; 
+            border-radius: 5px; 
+            text-align: left; 
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Chatbot</h1>
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box">
+            <!-- User messages and bot responses will be appended here dynamically -->
+        </div>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Type your message..." />
+            <button onclick="sendMessage()">Send </button>
+            
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            let userInput = document.getElementById("user-input").value.trim();
+            if (!userInput) return; // Don't send empty messages
+
+            let chatBox = document.getElementById("chat-box");
+            let userMessage = `<div class='user-message'><strong>You:</strong> ${userInput}</div>`;
+            chatBox.innerHTML += userMessage;
+            document.getElementById("user-input").value = ""; // Clear input field
+
+            try {
+                let response = await fetch("/chat", {  // Use relative path to avoid CORS issues
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: userInput })
+                });
+
+                let data = await response.json();
+                console.log("Response from backend:", data); // Debugging
+
+                // Handle missing or undefined responses
+                let botResponse = data.answer || "Error: No response from chatbot.";
+                let botMessage = `<div class='bot-response'><strong>AI:</strong> ${botResponse}</div>`;
+                chatBox.innerHTML += botMessage;
+            } catch (error) {
+                console.error("Error:", error);
+                chatBox.innerHTML += `<div class='bot-response'><strong>AI:</strong> Error fetching response.</div>`;
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
+        }
+    </script>
+</body>
+</html>
