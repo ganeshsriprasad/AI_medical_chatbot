@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>HR Chatbot</title>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body>
+    <div id="page-content-wrapper">
+        <nav class="navbar navbar-expand-lg border-bottom">
+          <div class="container-fluid">
+            <div class="logo" style="display: flex">
+              <button class="navbar-toggler" type="button" id="sidebarToggle">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <img src="{{ url_for('static', filename='css/Logo.png') }}">
+              <p style="font-size: 20px; font-family:'Poppins';">
+                <i class="fa-solid fa-user-ninja" style="padding-left: 25px;"></i>
+                Hi, {{ username }}
+              </p>
+            </div>
+            <div class="topnav-right" style="float: right">
+              <li class="nav-item pe-2 d-flex align-items-center">
+                <div style="gap: 10%; display: flex;">
+                  <div class="dropdown">
+                    <i class="fa-solid fa-circle-user fa-xl"></i>
+                    <button onclick="myFunction()" class="dropbtn"><i class="fa-solid fa-chevron-down fa-sm"></i></button>
+                    <div id="myDropdown" class="dropdown-content">
+                      <button id="light-theme"><i class="fa-solid fa-star-of-life fa-sm"></i> Light mode</button>
+                      <button id="dark-theme"><i class="fa-solid fa-moon fa-sm"></i> Dark mode</button>
+                      <hr>
+                      <a href="{{ url_for('home') }}"><i class="fa-solid fa-right-from-bracket"></i> Sign-out </a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </div>
+          </div>
+        </nav>
+      
+        <div class="container-fluid container-fluid-2" id="scroll-container">
+          
+      
+          <!-- <div class="chat-container">
+            {% if conversation %}
+              {% for message in conversation %}
+                <div class="user-chat-container">
+                  <div class="user-pic"><i class="fa-solid fa-circle-user"></i></div>
+                  <div class="user-message">{{ message['question'] }}</div>
+                </div>
+                <div class="bot-chat-container">
+                  <div class="bot-icon"><i class="fa-solid fa-robot fa-lg"></i></div>
+                  <div class="bot-response">{{ message['answer'] }}</div>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div> -->
+
+          <div class="chat-container">
+            <div class="chat-box" id="chat-box">
+                <!-- User messages and bot responses will be appended here dynamically -->
+            </div>
+            <div class="input-box">
+                <input type="text" id="user-input" placeholder="Type your message..." />
+                <button onclick="sendMessage()">Send </button>
+                
+            </div>
+        </div>
+      
+          <!-- <div class="container-fluid input-form">
+            <form action="" method="POST" class="submit-form" id="submitform">
+              <i style="opacity:0.6;margin-left:10px;" class="fa-regular fa-comment-dots"></i>
+              <input type="text" id="input_value" name="query" required placeholder="Ask me something...." />
+              <button id="submit-btn" type="submit">
+                <i class="fa-solid fa-paper-plane fa-xs"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+    </div> -->
+</div>
+</div>
+</body>
+</html>
+
+
+    <script>
+        async function sendMessage() {
+            let userInput = document.getElementById("user-input").value.trim();
+            if (!userInput) return; // Don't send empty messages
+
+            let chatBox = document.getElementById("chat-box");
+            let userMessage = `<div class='user-message'><strong>You:</strong> ${userInput}</div>`;
+            chatBox.innerHTML += userMessage;
+            document.getElementById("user-input").value = ""; // Clear input field
+
+            try {
+                let response = await fetch("/chat", {  // Use relative path to avoid CORS issues
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: userInput })
+                });
+
+                let data = await response.json();
+                console.log("Response from backend:", data); // Debugging
+
+                // Handle missing or undefined responses
+                let botResponse = data.answer || "Error: No response from chatbot.";
+                let botMessage = `<div class='bot-response'><strong>AI:</strong> ${botResponse}</div>`;
+                chatBox.innerHTML += botMessage;
+            } catch (error) {
+                console.error("Error:", error);
+                chatBox.innerHTML += `<div class='bot-response'><strong>AI:</strong> Error fetching response.</div>`;
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
+        }
+    </script>
+
